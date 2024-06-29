@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+        .centered-breadcrumb {
+            display: flex;
+            justify-content: center;
+        }
+        #progress-bar {
+            width: 70vw;
+            margin: 0 auto;
+        }
+        .sidebar-menu {
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .chip {
+            display: inline-block;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: white;
+            background-color: #00d1b2;
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Side Menu -->
+    <div class="sidebar-menu">
+        <aside class="menu">
+            <p class="menu-label">General</p>
+            <ul class="menu-list">
+                <li><a href="#" id="products-to-buy-link">Products to Buy</a></li>
+                <li><a href="#" id="past-orders-link">Past Orders</a></li>
+                <li><a href="#" id="products-to-sell-link">Products to Sell</a></li>
+                <li><a href="#" id="inventory-link">Inventory</a></li>
+                <li><a href="#" id="my-customers-link">My Customers</a></li>
+                <li><a href="#" id="my-vendors-link">My Vendors</a></li>
+                <li><a href="#" id="my-account-link">My Account</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <div class="content">
+        <!-- Navbar with Cart Icon -->
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="#">
+                    <h1 class="title">Equipify</h1>
+                </a>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <div class="navbar-end">
+                    <a class="navbar-item" id="cart-link">
+                        <span class="icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </span>
+                        <span class="button is-primary">
+                            Cart (<span id="cart-count">0</span>)
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Simplified Progress Bar -->
+        <progress class="progress is-primary" id="progress-bar" value="25" max="100">25%</progress>
+
+        <!-- Main Page: Product Listing -->
+        <section class="section" id="product-section">
+            <div class="container">
+                <h1 class="title">Industrial Products</h1>
+                <!-- Product Tabs -->
+                <div class="tabs is-centered">
+                    <ul id="product-tabs">
+                        <li class="is-active"><a data-category="all">All</a></li>
+                        <li><a data-category="tools">Tools</a></li>
+                        <li><a data-category="safety">Safety</a></li>
+                        <li><a data-category="machinery">Machinery</a></li>
+                    </ul>
+                </div>
+                <div class="columns is-multiline" id="product-list">
+                    <!-- Product Items will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Details -->
+        <section class="section" id="product-details-section" style="display:none;">
+            <div class="container">
+                <h1 class="title" id="product-details-title"></h1>
+                <p id="product-details-description"></p>
+                <p class="subtitle" id="product-details-price"></p>
+                <div class="field">
+                    <label class="label">Quantity</label>
+                    <div class="control">
+                        <input class="input" type="number" id="product-details-quantity" value="1" min="1">
+                    </div>
+                </div>
+                <button class="button is-link" id="product-details-add-to-cart">Add to Cart</button>
+            </div>
+        </section>
+
+        <!-- Cart -->
+        <section class="section" id="cart-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Your Cart</h1>
+                <div id="cart-items">
+                    <!-- Cart Items will be injected here by JavaScript -->
+                </div>
+                <div class="field">
+                    <label class="label">Total:</label>
+                    <p id="cart-total" class="title">$0.00</p>
+                </div>
+                <button class="button is-primary" id="checkout-button">Proceed to Checkout</button>
+            </div>
+        </section>
+
+        <!-- Checkout -->
+        <section class="section" id="checkout-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Checkout</h1>
+                <form id="checkout-form">
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your Name" id="checkout-name" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control">
+                            <input class="input" type="email" placeholder="Your Email" id="checkout-email" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Address</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your Address" id="checkout-address" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">City</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your City" id="checkout-city" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Postal Code</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your Postal Code" id="checkout-postal" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Credit Card Number</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Your Credit Card Number" id="checkout-card" required>
+                        </div>
+                    </div>
+                    <button class="button is-success" type="submit">Submit Order</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Confirmation -->
+        <section class="section" id="confirmation-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Order Confirmation</h1>
+                <p id="confirmation-message">
+                    <span class="icon has-text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    Thank you for your order!
+                </p>
+                <div id="order-summary">
+                    <!-- Order summary will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Products to Sell -->
+        <section class="section" id="products-to-sell-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Products to Sell</h1>
+                <div class="columns is-multiline" id="created-products">
+                    <!-- Created products will be injected here by JavaScript -->
+                </div>
+                <hr>
+                <div id="sell-product-form">
+                    <h2 class="subtitle">Create a New Product</h2>
+                    <form id="product-sell-form">
+                        <div class="field">
+                            <label class="label">Product Images</label>
+                            <div class="control">
+                                <input class="input" type="file" id="product-images" multiple>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Title</label>
+                            <div class="control">
+                                <input class="input" type="text" id="product-title" placeholder="Product Title" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Description</label>
+                            <div class="control">
+                                <textarea class="textarea" id="product-description" placeholder="Product Description" required></textarea>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Category</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="product-category" required>
+                                        <option value="tools">Tools</option>
+                                        <option value="safety">Safety</option>
+                                        <option value="machinery">Machinery</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Price</label>
+                            <div class="control">
+                                <input class="input" type="number" id="product-price" placeholder="Product Price" required>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button class="button is-success" type="submit">Submit Product</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-light" type="button" id="cancel-product">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Customers -->
+        <section class="section" id="my-customers-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">My Customers</h1>
+                <div class="columns is-multiline" id="customer-cards">
+                    <!-- Customer Cards will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- My Vendors -->
+        <section class="section" id="my-vendors-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">My Vendors</h1>
+                <div class="columns is-multiline" id="vendor-cards">
+                    <!-- Vendor Cards will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- My Account -->
+        <section class="section" id="my-account-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">My Account</h1>
+                <form id="account-form">
+                    <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                            <input class="input" type="text" id="account-name" placeholder="Your Name" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Email</label>
+                        <div class="control">
+                            <input class="input" type="email" id="account-email" placeholder="Your Email" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Address</label>
+                        <div class="control">
+                            <input class="input" type="text" id="account-address" placeholder="Your Address" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">City</label>
+                        <div class="control">
+                            <input class="input" type="text" id="account-city" placeholder="Your City" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Postal Code</label>
+                        <div class="control">
+                            <input class="input" type="text" id="account-postal" placeholder="Your Postal Code" required>
+                        </div>
+                    </div>
+                    <button class="button is-success" type="submit">Save</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Inventory -->
+        <section class="section" id="inventory-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Inventory</h1>
+                <div class="columns is-multiline" id="inventory-cards">
+                    <!-- Inventory cards will be injected here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Past Orders -->
+        <section class="section" id="past-orders-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Past Orders</h1>
+                <div class="columns is-multiline" id="order-summary-cards">
+                    <!-- Order summary cards will be injected here by JavaScript -->
+                </div>
+                <table class="table is-fullwidth is-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="past-orders-table">
+                        <!-- Past orders will be injected here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="notification is-success" style="display:none; position: fixed; bottom: 20px; right: 20px;">
+            Item added to cart successfully!
+        </div>
+    </div>
+
+    <!-- JavaScript to handle the interaction -->
+    <script>
+        // Example Product Data
+        const products = [
+            { id: 1, name: 'Industrial Drill', description: 'A high-quality industrial drill for heavy-duty use.', price: 199.99, category: 'tools', images: [] },
+            { id: 2, name: 'Hydraulic Press', description: 'A powerful hydraulic press for various industrial applications.', price: 1299.99, category: 'machinery', images: [] },
+            { id: 3, name: 'Welding Machine', description: 'A reliable welding machine for precision welding tasks.', price: 499.99, category: 'machinery', images: [] },
+            { id: 4, name: 'Bolt Cutter', description: 'Durable bolt cutter for heavy-duty cutting.', price: 99.99, category: 'tools', images: [] },
+            { id: 5, name: 'Angle Grinder', description: 'High-performance angle grinder for industrial use.', price: 149.99, category: 'tools', images: [] },
+            { id: 6, name: 'Cutting Torch', description: 'Precision cutting torch for accurate cuts.', price: 179.99, category: 'tools', images: [] },
+            { id: 7, name: 'Electric Sander', description: 'Efficient electric sander for smooth finishes.', price: 129.99, category: 'tools', images: [] },
+            { id: 8, name: 'Power Saw', description: 'Powerful saw for industrial applications.', price: 299.99, category: 'tools', images: [] },
+            { id: 9, name: 'Impact Wrench', description: 'High-torque impact wrench for tough jobs.', price: 249.99, category: 'tools', images: [] },
+            { id: 10, name: 'Work Light', description: 'Bright work light for better visibility.', price: 49.99, category: 'tools', images: [] },
+            { id: 11, name: 'Pipe Bender', description: 'Heavy-duty pipe bender for precision bending.', price: 399.99, category: 'machinery', images: [] },
+            { id: 12, name: 'Rivet Gun', description: 'Reliable rivet gun for industrial use.', price: 89.99, category: 'tools', images: [] },
+            { id: 13, name: 'Torque Wrench', description: 'Accurate torque wrench for precise tightening.', price: 129.99, category: 'tools', images: [] },
+            { id: 14, name: 'Workbench', description: 'Sturdy workbench for industrial environments.', price: 599.99, category: 'machinery', images: [] },
+            { id: 15, name: 'Ladder', description: 'Heavy-duty ladder for industrial use.', price: 199.99, category: 'machinery', images: [] },
+            { id: 16, name: 'Safety Glasses', description: 'Protective safety glasses for eye protection.', price: 29.99, category: 'safety', images: [] },
+            { id: 17, name: 'Ear Protection', description: 'Noise-cancelling ear protection for safety.', price: 39.99, category: 'safety', images: [] },
+            { id: 18, name: 'Work Gloves', description: 'Durable work gloves for hand protection.', price: 19.99, category: 'safety', images: [] },
+            { id: 19, name: 'Dust Mask', description: 'Protective dust mask for respiratory safety.', price: 9.99, category: 'safety', images: [] },
+            { id: 20, name: 'Toolbox', description: 'Spacious toolbox for tool storage.', price: 79.99, category: 'tools', images: [] },
+            { id: 21, name: 'Electric Drill', description: 'Versatile electric drill for various tasks.', price: 99.99, category: 'tools', images: [] },
+            { id: 22, name: 'Jackhammer', description: 'Powerful jackhammer for demolition work.', price: 499.99, category: 'machinery', images: [] },
+            { id: 23, name: 'Chainsaw', description: 'Heavy-duty chainsaw for industrial use.', price: 399.99, category: 'tools', images: [] },
+            { id: 24, name: 'Welding Helmet', description: 'Protective welding helmet for safety.', price: 49.99, category: 'safety', images: [] },
+            { id: 25, name: 'Measuring Tape', description: 'Accurate measuring tape for precise measurements.', price: 19.99, category: 'tools', images: [] },
+            { id: 26, name: 'Heat Gun', description: 'High-temperature heat gun for industrial use.', price: 79.99, category: 'tools', images: [] },
+            { id: 27, name: 'C-Clamp', description: 'Sturdy C-clamp for secure clamping.', price: 29.99, category: 'tools', images: [] },
+            { id: 28, name: 'Pry Bar', description: 'Durable pry bar for heavy-duty prying.', price: 24.99, category: 'tools', images: [] },
+            { id: 29, name: 'Utility Knife', description: 'Sharp utility knife for various cutting tasks.', price: 14.99, category: 'tools', images: [] },
+            { id: 30, name: 'Wire Stripper', description: 'Efficient wire stripper for electrical work.', price: 19.99, category: 'tools', images: [] }
+            // Add more products as needed
+        ];
+
+        // Example Customer and Vendor Data
+        const customers = [
+            { id: 1, name: 'Customer One', details: 'Details about Customer One' },
+            { id: 2, name: 'Customer Two', details: 'Details about Customer Two' },
+            // Add more customers as needed
+        ];
+
+        const vendors = [
+            { id: 1, name: 'Vendor One', details: 'Details about Vendor One' },
+            { id: 2, name: 'Vendor Two', details: 'Details about Vendor Two' },
+            // Add more vendors as needed
+        ];
+
+        const inventory = [];
+
+        // Function to display products on the main page
+        function displayProducts(category = 'all') {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+            const filteredProducts = category === 'all' ? products : products.filter(product => product.category === category);
+            filteredProducts.forEach(product => {
+                const productCard = `
+                    <div class="column is-one-quarter">
+                        <div class="card" onclick="showProductDetails(${product.id})">
+                            <div class="card-content">
+                                <p class="title">${product.name}</p>
+                                <p class="subtitle">$${product.price}</p>
+                                <p>${product.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productList.innerHTML += productCard;
+            });
+        }
+
+        // Function to add products to the cart
+        let cart = [];
+        function addToCart(productId, quantity = 1) {
+            const product = products.find(p => p.id === productId);
+            const cartItem = cart.find(item => item.product.id === productId);
+            if (cartItem) {
+                cartItem.quantity += quantity;
+            } else {
+                cart.push({ product, quantity });
+            }
+            updateCartCount();
+            showToast('Item added to cart successfully!');
+        }
+
+        // Function to update cart count
+        function updateCartCount() {
+            const cartCount = document.getElementById('cart-count');
+            const totalCount = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalCount;
+        }
+
+        // Function to display the cart
+        function displayCart() {
+            document.getElementById('cart-section').style.display = 'block';
+            document.getElementById('product-section').style.display = 'none';
+            document.getElementById('product-details-section').style.display = 'none';
+            document.getElementById('checkout-section').style.display = 'none';
+            document.getElementById('confirmation-section').style.display = 'none';
+            updateProgress(2);
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const cartItem = `
+                    <div class="box">
+                        <p>${item.product.name} - $${item.product.price}</p>
+                        <div class="field">
+                            <label class="label">Quantity</label>
+                            <div class="control">
+                                <input class="input" type="number" value="${item.quantity}" min="1" onchange="updateCartItemQuantity(${item.product.id}, this.value)">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cartItems.innerHTML += cartItem;
+                total += item.product.price * item.quantity;
+            });
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Function to update cart item quantity
+        function updateCartItemQuantity(productId, quantity) {
+            const cartItem = cart.find(item => item.product.id === productId);
+            if (cartItem) {
+                cartItem.quantity = parseInt(quantity, 10);
+                updateCartCount();
+                displayCart();
+            }
+        }
+
+        // Function to display product details
+        function showProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            document.getElementById('product-details-title').textContent = product.name;
+            document.getElementById('product-details-description').textContent = product.description;
+            document.getElementById('product-details-price').textContent = `$${product.price}`;
+            document.getElementById('product-details-add-to-cart').onclick = () => addToCart(product.id, parseInt(document.getElementById('product-details-quantity').value));
+
+            document.getElementById('product-details-section').style.display = 'block';
+            document.getElementById('product-section').style.display = 'none';
+            document.getElementById('cart-section').style.display = 'none';
+            document.getElementById('checkout-section').style.display = 'none';
+            document.getElementById('confirmation-section').style.display = 'none';
+            updateProgress(1);
+        }
+
+        // Event listener for cart link
+        document.getElementById('cart-link').addEventListener('click', displayCart);
+
+        // Event listener for checkout button
+        document.getElementById('checkout-button').addEventListener('click', () => {
+            document.getElementById('cart-section').style.display = 'none';
+            document.getElementById('checkout-section').style.display = 'block';
+            updateProgress(3);
+        });
+
+        // Event listener for checkout form submission
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = e.target.querySelector('input[placeholder="Your Name"]').value;
+            const email = e.target.querySelector('input[placeholder="Your Email"]').value;
+            const address = e.target.querySelector('input[placeholder="Your Address"]').value;
+            const city = e.target.querySelector('input[placeholder="Your City"]').value;
+            const postal = e.target.querySelector('input[placeholder="Your Postal Code"]').value;
+
+            // Save to My Account section
+            document.getElementById('account-name').value = name;
+            document.getElementById('account-email').value = email;
+            document.getElementById('account-address').value = address;
+            document.getElementById('account-city').value = city;
+            document.getElementById('account-postal').value = postal;
+
+            const orderId = Date.now();
+            const orderDate = new Date().toLocaleString();
+            const orderTotal = cart.reduce((total, item) => total + item.product.price * item.quantity, 0);
+            const orderItems = cart.map(item => `${item.product.name} (${item.quantity})`).join(', ');
+
+            const order = {
+                id: orderId,
+                date: orderDate,
+                items: orderItems,
+                total: orderTotal.toFixed(2)
+            };
+            addOrderToPastOrders(order);
+            addOrderToInventory(order);
+
+            document.getElementById('checkout-section').style.display = 'none';
+            document.getElementById('confirmation-section').style.display = 'block';
+            document.getElementById('confirmation-message').innerHTML = `
+                <span class="icon has-text-success">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+                Thank you for your order, ${name}!
+            `;
+            showOrderSummary(order);
+            showToast('Order placed successfully!');
+            resetCart();
+        });
+
+        // Function to add order to past orders
+        function addOrderToPastOrders(order) {
+            const pastOrdersTable = document.getElementById('past-orders-table');
+            const orderRow = `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.date}</td>
+                    <td>${order.items}</td>
+                    <td>$${order.total}</td>
+                </tr>
+            `;
+            pastOrdersTable.innerHTML += orderRow;
+
+            const orderSummaryCards = document.getElementById('order-summary-cards');
+            const orderCard = `
+                <div class="column is-one-quarter">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title">Order ID: ${order.id}</p>
+                            <p>Date: ${order.date}</p>
+                            <p>Total: $${order.total}</p>
+                            <span class="chip">In Inventory</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            orderSummaryCards.innerHTML += orderCard;
+        }
+
+        // Function to add order to inventory
+        function addOrderToInventory(order) {
+            order.items.split(', ').forEach(item => {
+                const [productName, quantity] = item.split(' (');
+                const product = products.find(p => p.name === productName);
+                const inventoryItem = inventory.find(item => item.product.id === product.id);
+                if (inventoryItem) {
+                    inventoryItem.quantity += parseInt(quantity);
+                    inventoryItem.dateUpdated = new Date().toLocaleString();
+                } else {
+                    inventory.push({
+                        product,
+                        quantity: parseInt(quantity),
+                        dateUpdated: new Date().toLocaleString()
+                    });
+                }
+            });
+            displayInventory();
+        }
+
+        // Function to show order summary
+        function showOrderSummary(order) {
+            const orderSummary = document.getElementById('order-summary');
+            orderSummary.innerHTML = '<h2 class="subtitle">Order Summary:</h2>';
+            orderSummary.innerHTML += `
+                <p>Order ID: ${order.id}</p>
+                <p>Date: ${order.date}</p>
+                <p>Items: ${order.items}</p>
+                <p>Total: $${order.total}</p>
+            `;
+        }
+
+        // Function to reset cart
+        function resetCart() {
+            cart = [];
+            updateCartCount();
+        }
+
+        // Function to show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event listeners for sidebar menu
+        document.getElementById('products-to-buy-link').addEventListener('click', () => {
+            displaySection('product-section');
+            updateProgress(1);
+        });
+
+        document.getElementById('past-orders-link').addEventListener('click', () => {
+            displaySection('past-orders-section');
+        });
+
+        document.getElementById('products-to-sell-link').addEventListener('click', () => {
+            displaySection('products-to-sell-section');
+            displayCreatedProducts();
+        });
+
+        document.getElementById('inventory-link').addEventListener('click', () => {
+            displaySection('inventory-section');
+            displayInventory();
+        });
+
+        document.getElementById('my-customers-link').addEventListener('click', () => {
+            displaySection('my-customers-section');
+            displayCustomerProfiles();
+        });
+
+        document.getElementById('my-vendors-link').addEventListener('click', () => {
+            displaySection('my-vendors-section');
+            displayVendorProfiles();
+        });
+
+        document.getElementById('my-account-link').addEventListener('click', () => {
+            displaySection('my-account-section');
+        });
+
+        // Function to display the selected section and hide others
+        function displaySection(sectionId) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Function to update progress bar
+        function updateProgress(step) {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.value = step * 33.33;
+            progressBar.textContent = `${progressBar.value}%`;
+        }
+
+        // Event listener for product tabs
+        document.getElementById('product-tabs').addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') {
+                const category = e.target.getAttribute('data-category');
+                displayProducts(category);
+                const tabs = document.querySelectorAll('#product-tabs li');
+                tabs.forEach(tab => tab.classList.remove('is-active'));
+                e.target.parentElement.classList.add('is-active');
+            }
+        });
+
+        // Function to display customer profiles
+        function displayCustomerProfiles() {
+            const customerCards = document.getElementById('customer-cards');
+            customerCards.innerHTML = '';
+            customers.forEach(customer => {
+                const customerCard = `
+                    <div class="column is-one-quarter">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title">${customer.name}</p>
+                                <p class="subtitle">${customer.details}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                customerCards.innerHTML += customerCard;
+            });
+        }
+
+        // Function to display vendor profiles
+        function displayVendorProfiles() {
+            const vendorCards = document.getElementById('vendor-cards');
+            vendorCards.innerHTML = '';
+            vendors.forEach(vendor => {
+                const vendorCard = `
+                    <div class="column is-one-quarter">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title">${vendor.name}</p>
+                                <p class="subtitle">${vendor.details}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                vendorCards.innerHTML += vendorCard;
+            });
+        }
+
+        // Event listener for product sell form submission
+        document.getElementById('product-sell-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('product-title').value;
+            const description = document.getElementById('product-description').value;
+            const category = document.getElementById('product-category').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const images = Array.from(document.getElementById('product-images').files);
+
+            const newProduct = {
+                id: Date.now(),
+                name: title,
+                description: description,
+                price: price,
+                category: category,
+                images: images
+            };
+
+            products.push(newProduct);
+            showToast('Product submitted successfully!');
+            displayProducts();
+            document.getElementById('product-sell-form').reset();
+            displayCreatedProducts();
+        });
+
+        // Function to display created products in "Products to Sell" section
+        function displayCreatedProducts() {
+            const createdProducts = document.getElementById('created-products');
+            createdProducts.innerHTML = '';
+            products.forEach(product => {
+                const productCard = `
+                    <div class="column is-one-quarter">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title">${product.name}</p>
+                                <p class="subtitle">$${product.price}</p>
+                                <p>${product.description}</p>
+                                <button class="button is-link" onclick="editProduct(${product.id})">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                createdProducts.innerHTML += productCard;
+            });
+        }
+
+        // Function to edit a product
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            document.getElementById('product-title').value = product.name;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-category').value = product.category;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-sell-form').style.display = 'none';
+            document.getElementById('product-details-section').style.display = 'block';
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.classList.add('button', 'is-success');
+            saveButton.onclick = (e) => {
+                e.preventDefault();
+                product.name = document.getElementById('product-title').value;
+                product.description = document.getElementById('product-description').value;
+                product.category = document.getElementById('product-category').value;
+                product.price = parseFloat(document.getElementById('product-price').value);
+                showToast('Product updated successfully!');
+                displayCreatedProducts();
+                document.getElementById('product-sell-form').reset();
+                document.getElementById('product-details-section').style.display = 'none';
+                document.getElementById('product-sell-form').style.display = 'block';
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('button', 'is-light');
+            cancelButton.onclick = (e) => {
+                e.preventDefault();
+                document.getElementById('product-details-section').style.display = 'none';
+                document.getElementById('product-sell-form').style.display = 'block';
+            };
+
+            const detailsSection = document.getElementById('product-details-section');
+            detailsSection.appendChild(saveButton);
+            detailsSection.appendChild(cancelButton);
+        }
+
+        // Function to display inventory items
+        function displayInventory() {
+            const inventoryCards = document.getElementById('inventory-cards');
+            inventoryCards.innerHTML = '';
+            inventory.forEach(item => {
+                const inventoryCard = `
+                    <div class="column is-one-quarter">
+                        <div class="card">
+                            <div class="card-content">
+                                <p class="title">${item.product.name}</p>
+                                <p class="subtitle">Quantity: ${item.quantity}</p>
+                                <p>Last Updated: ${item.dateUpdated}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                inventoryCards.innerHTML += inventoryCard;
+            });
+        }
+
+        // Initialize the app
+        displayProducts();
+        document.getElementById('product-sell-form').onsubmit = submitNewProduct;
+
+        // Event listener for cancel button in the product sell form
+        document.getElementById('cancel-product').addEventListener('click', () => {
+            document.getElementById('product-sell-form').reset();
+        });
+    </script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</body>
+</html>
