@@ -35,6 +35,18 @@
             background-color: #00d1b2;
             border-radius: 1rem;
         }
+        .menu-list a {
+            padding: 10px;
+            display: block;
+        }
+        .menu-list a:hover {
+            background-color: #00d1b2;
+            color: white;
+        }
+        .menu-list a.is-active {
+            background-color: #00c4a7;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +95,7 @@
         </nav>
 
         <!-- Simplified Progress Bar -->
-        <progress class="progress is-primary" id="progress-bar" value="25" max="100">25%</progress>
+        <progress class="progress is-primary" id="progress-bar" value="0" max="100">0%</progress>
 
         <!-- Main Page: Product Listing -->
         <section class="section" id="product-section">
@@ -254,6 +266,59 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </section>
+
+        <!-- Edit Product -->
+        <section class="section" id="edit-product-section" style="display:none;">
+            <div class="container">
+                <h1 class="title">Edit Product</h1>
+                <form id="edit-product-form">
+                    <div class="field">
+                        <label class="label">Product Images</label>
+                        <div class="control">
+                            <input class="input" type="file" id="edit-product-images" multiple>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Title</label>
+                        <div class="control">
+                            <input class="input" type="text" id="edit-product-title" placeholder="Product Title" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Description</label>
+                        <div class="control">
+                            <textarea class="textarea" id="edit-product-description" placeholder="Product Description" required></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Category</label>
+                        <div class="control">
+                            <div class="select">
+                                <select id="edit-product-category" required>
+                                    <option value="tools">Tools</option>
+                                    <option value="safety">Safety</option>
+                                    <option value="machinery">Machinery</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Price</label>
+                        <div class="control">
+                            <input class="input" type="number" id="edit-product-price" placeholder="Product Price" required>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button class="button is-success" type="submit">Save</button>
+                        </div>
+                        <div class="control">
+                            <button class="button is-light" type="button" id="cancel-edit">Cancel</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </section>
 
@@ -443,11 +508,12 @@
             showToast('Item added to cart successfully!');
         }
 
-        // Function to update cart count
+        // Function to update cart count and progress bar
         function updateCartCount() {
             const cartCount = document.getElementById('cart-count');
             const totalCount = cart.reduce((total, item) => total + item.quantity, 0);
             cartCount.textContent = totalCount;
+            updateProgress(totalCount > 0 ? 33.33 : 0);
         }
 
         // Function to display the cart
@@ -457,7 +523,7 @@
             document.getElementById('product-details-section').style.display = 'none';
             document.getElementById('checkout-section').style.display = 'none';
             document.getElementById('confirmation-section').style.display = 'none';
-            updateProgress(2);
+            updateProgress(33.33);
             const cartItems = document.getElementById('cart-items');
             cartItems.innerHTML = '';
             let total = 0;
@@ -502,7 +568,7 @@
             document.getElementById('cart-section').style.display = 'none';
             document.getElementById('checkout-section').style.display = 'none';
             document.getElementById('confirmation-section').style.display = 'none';
-            updateProgress(1);
+            updateProgress(0);
         }
 
         // Event listener for cart link
@@ -512,7 +578,7 @@
         document.getElementById('checkout-button').addEventListener('click', () => {
             document.getElementById('cart-section').style.display = 'none';
             document.getElementById('checkout-section').style.display = 'block';
-            updateProgress(3);
+            updateProgress(66.66);
         });
 
         // Event listener for checkout form submission
@@ -556,6 +622,7 @@
             showOrderSummary(order);
             showToast('Order placed successfully!');
             resetCart();
+            updateProgress(100);
         });
 
         // Function to add order to past orders
@@ -638,35 +705,41 @@
         // Event listeners for sidebar menu
         document.getElementById('products-to-buy-link').addEventListener('click', () => {
             displaySection('product-section');
-            updateProgress(1);
+            updateProgress(0);
         });
 
         document.getElementById('past-orders-link').addEventListener('click', () => {
             displaySection('past-orders-section');
+            updateProgress(0);
         });
 
         document.getElementById('products-to-sell-link').addEventListener('click', () => {
             displaySection('products-to-sell-section');
             displayCreatedProducts();
+            updateProgress(0);
         });
 
         document.getElementById('inventory-link').addEventListener('click', () => {
             displaySection('inventory-section');
             displayInventory();
+            updateProgress(0);
         });
 
         document.getElementById('my-customers-link').addEventListener('click', () => {
             displaySection('my-customers-section');
             displayCustomerProfiles();
+            updateProgress(0);
         });
 
         document.getElementById('my-vendors-link').addEventListener('click', () => {
             displaySection('my-vendors-section');
             displayVendorProfiles();
+            updateProgress(0);
         });
 
         document.getElementById('my-account-link').addEventListener('click', () => {
             displaySection('my-account-section');
+            updateProgress(0);
         });
 
         // Function to display the selected section and hide others
@@ -679,12 +752,22 @@
                     section.style.display = 'none';
                 }
             });
+
+            // Update active menu link
+            const menuLinks = document.querySelectorAll('.menu-list a');
+            menuLinks.forEach(link => {
+                if (link.id === `${sectionId}-link`) {
+                    link.classList.add('is-active');
+                } else {
+                    link.classList.remove('is-active');
+                }
+            });
         }
 
         // Function to update progress bar
         function updateProgress(step) {
             const progressBar = document.getElementById('progress-bar');
-            progressBar.value = step * 33.33;
+            progressBar.value = step;
             progressBar.textContent = `${progressBar.value}%`;
         }
 
@@ -757,7 +840,6 @@
 
             products.push(newProduct);
             showToast('Product submitted successfully!');
-            displayProducts();
             document.getElementById('product-sell-form').reset();
             displayCreatedProducts();
         });
@@ -786,41 +868,25 @@
         // Function to edit a product
         function editProduct(productId) {
             const product = products.find(p => p.id === productId);
-            document.getElementById('product-title').value = product.name;
-            document.getElementById('product-description').value = product.description;
-            document.getElementById('product-category').value = product.category;
-            document.getElementById('product-price').value = product.price;
-            document.getElementById('product-sell-form').style.display = 'none';
-            document.getElementById('product-details-section').style.display = 'block';
+            document.getElementById('edit-product-title').value = product.name;
+            document.getElementById('edit-product-description').value = product.description;
+            document.getElementById('edit-product-category').value = product.category;
+            document.getElementById('edit-product-price').value = product.price;
 
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save';
-            saveButton.classList.add('button', 'is-success');
-            saveButton.onclick = (e) => {
+            document.getElementById('edit-product-section').style.display = 'block';
+            document.getElementById('products-to-sell-section').style.display = 'none';
+
+            document.getElementById('edit-product-form').onsubmit = (e) => {
                 e.preventDefault();
-                product.name = document.getElementById('product-title').value;
-                product.description = document.getElementById('product-description').value;
-                product.category = document.getElementById('product-category').value;
-                product.price = parseFloat(document.getElementById('product-price').value);
+                product.name = document.getElementById('edit-product-title').value;
+                product.description = document.getElementById('edit-product-description').value;
+                product.category = document.getElementById('edit-product-category').value;
+                product.price = parseFloat(document.getElementById('edit-product-price').value);
                 showToast('Product updated successfully!');
                 displayCreatedProducts();
-                document.getElementById('product-sell-form').reset();
-                document.getElementById('product-details-section').style.display = 'none';
-                document.getElementById('product-sell-form').style.display = 'block';
+                document.getElementById('edit-product-section').style.display = 'none';
+                document.getElementById('products-to-sell-section').style.display = 'block';
             };
-
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel';
-            cancelButton.classList.add('button', 'is-light');
-            cancelButton.onclick = (e) => {
-                e.preventDefault();
-                document.getElementById('product-details-section').style.display = 'none';
-                document.getElementById('product-sell-form').style.display = 'block';
-            };
-
-            const detailsSection = document.getElementById('product-details-section');
-            detailsSection.appendChild(saveButton);
-            detailsSection.appendChild(cancelButton);
         }
 
         // Function to display inventory items
@@ -850,6 +916,12 @@
         // Event listener for cancel button in the product sell form
         document.getElementById('cancel-product').addEventListener('click', () => {
             document.getElementById('product-sell-form').reset();
+        });
+
+        // Event listener for cancel button in the edit product form
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            document.getElementById('edit-product-section').style.display = 'none';
+            document.getElementById('products-to-sell-section').style.display = 'block';
         });
     </script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
